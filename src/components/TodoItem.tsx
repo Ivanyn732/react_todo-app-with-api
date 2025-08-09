@@ -138,12 +138,16 @@ export const TodoItem: React.FC<Props> = ({
             onChange={handleTitleChange}
             onKeyUp={handleKeyUp}
             onBlur={async () => {
-              const ok = await handleEditSubmit();
+              await new Promise(resolve => setTimeout(resolve, 0));
 
-              if (ok) {
-                setTimeout(() => setEditingTodoId(null), 5000);
-              } else {
-                setTimeout(() => editInputRef.current?.focus(), 0);
+              if (isEditing) {
+                const ok = await handleEditSubmit();
+
+                if (ok) {
+                  setTimeout(() => setEditingTodoId(null), 0);
+                } else {
+                  setTimeout(() => editInputRef.current?.focus(), 0);
+                }
               }
             }}
           />
