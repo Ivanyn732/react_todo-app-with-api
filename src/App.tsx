@@ -102,9 +102,10 @@ export const App: React.FC = () => {
       await deleteTodo(todoId);
       setTodos(current => current.filter(todo => todo.id !== todoId));
       inputRef.current?.focus();
-    } catch {
+    } catch (err) {
       setError('Unable to delete a todo');
       setTimeout(() => setError(''), 3000);
+      throw err;
     } finally {
       setDeletingTodoIds(ids => ids.filter(id => id !== todoId));
     }
@@ -210,9 +211,10 @@ export const App: React.FC = () => {
           todo.id === todoId ? { ...todo, title: updatedTodo.title } : todo,
         ),
       );
-    } catch {
+    } catch (err) {
       setError('Unable to update a todo');
       setTimeout(() => setError(''), 3000);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -245,7 +247,6 @@ export const App: React.FC = () => {
           onToggleStatus={onToggleStatus}
           loadingTodoIds={[]}
           loadingAllTodos={loading}
-          inputRef={inputRef}
           editingTodoId={editingTodoId}
           setEditingTodoId={setEditingTodoId}
           setLoading={setLoading}

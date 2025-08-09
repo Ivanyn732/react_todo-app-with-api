@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Todo } from '../types/Todo';
 
 type Props = {
@@ -11,7 +11,6 @@ type Props = {
   loading?: boolean;
   editingTodoId: number | null;
   setEditingTodoId: (id: number | null) => void;
-  inputRef: React.RefObject<HTMLInputElement>;
   onRename: (todoId: number, newTitle: string) => void;
   setError: (message: string) => void;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,7 +24,6 @@ export const TodoItem: React.FC<Props> = ({
   onToggleStatus,
   isLoading,
   loading,
-  inputRef,
   editingTodoId,
   setEditingTodoId,
   onRename,
@@ -34,10 +32,15 @@ export const TodoItem: React.FC<Props> = ({
 }) => {
   const isEditing = editingTodoId === id;
   const [editedTitle, setEditedTitle] = useState(title);
+  const editInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, [inputRef, isEditing]);
+    // коли входимо в режим редагування — фокус на локальний інпут
+    if (isEditing) {
+      // невелике таймаут, щоб елемент встиг промальоватись у DOM
+      setTimeout(() => editInputRef.current?.focus(), 0);
+    }
+  }, [isEditing]);
 
   useEffect(() => {
     setEditedTitle(title);
@@ -47,41 +50,46 @@ export const TodoItem: React.FC<Props> = ({
     setEditedTitle(event.target.value);
   };
 
-  const handleEditSubmit = async () => {
+  const handleEditSubmit = async (): Promise<boolean> => {
     const trimmedTitle = editedTitle.trim();
 
     if (!trimmedTitle) {
       try {
         setLoading(true);
         await onDelete(id);
+
+        return true;
       } catch {
         setError('Unable to delete a todo');
         setTimeout(() => setError(''), 3000);
+
+        return false;
       } finally {
         setLoading(false);
       }
-
-      return;
     }
 
     if (trimmedTitle === title) {
       setEditingTodoId(null);
 
-      return;
+      return true;
     }
 
     try {
+      setLoading(true);
       await onRename(id, trimmedTitle);
-      setEditingTodoId(null);
+
+      return true;
     } catch {
-      setError('Unable to delete a todo');
-    } // видалив finally
+      setError('Unable to update a todo');
+
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-    }
-
+  const handleKeyUp = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') {
       setEditedTitle(title);
       setEditingTodoId(null);
@@ -110,20 +118,34 @@ export const TodoItem: React.FC<Props> = ({
 
       {isEditing ? (
         <form
-          onSubmit={e => {
+          onSubmit={async e => {
             e.preventDefault();
-            handleEditSubmit();
+            const ok = await handleEditSubmit();
+
+            if (ok) {
+              setEditingTodoId(null);
+            } else {
+              setTimeout(() => editInputRef.current?.focus(), 0);
+            }
           }}
         >
           <input
-            ref={inputRef}
+            ref={editInputRef}
             type="text"
             data-cy="TodoTitleField"
             className="todo__title-field"
             value={editedTitle}
             onChange={handleTitleChange}
             onKeyUp={handleKeyUp}
-            onBlur={handleEditSubmit}
+            onBlur={async () => {
+              const ok = await handleEditSubmit();
+
+              if (ok) {
+                setTimeout(() => setEditingTodoId(null), 5000);
+              } else {
+                setTimeout(() => editInputRef.current?.focus(), 0);
+              }
+            }}
           />
         </form>
       ) : (
@@ -135,10 +157,6 @@ export const TodoItem: React.FC<Props> = ({
           {title}
         </span>
       )}
-
-      {/* <span data-cy="TodoTitle" className="todo__title">
-        {title}
-      </span> */}
 
       {!isEditing && (
         <button
