@@ -211,7 +211,8 @@ export const App: React.FC = () => {
         ),
       );
     } catch {
-      setError('Unable to rename the todo');
+      setError('Unable to update a todo');
+      setTimeout(() => setError(''), 3000);
     } finally {
       setLoading(false);
     }
@@ -243,6 +244,7 @@ export const App: React.FC = () => {
         <TodoList
           todos={filteredTodos}
           tempTodo={tempTodo}
+          setError={setError}
           onDelete={handleDelete}
           onRename={handleRename}
           deletingTodoIds={deletingTodoIds}
@@ -252,6 +254,7 @@ export const App: React.FC = () => {
           inputRef={inputRef}
           editingTodoId={editingTodoId}
           setEditingTodoId={setEditingTodoId}
+          setLoading={setLoading}
         />
 
         {/* Hide the footer if there are no todos */}
@@ -268,7 +271,7 @@ export const App: React.FC = () => {
 
       {/* DON'T use conditional rendering to hide the notification */}
       {/* Add the 'hidden' class to hide the message smoothly */}
-      <Error error={error} />
+      <Error error={error} onClose={() => setError('')} />
     </div>
   );
 };

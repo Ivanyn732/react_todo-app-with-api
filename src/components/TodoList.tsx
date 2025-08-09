@@ -14,6 +14,8 @@ type Props = {
   editingTodoId: number | null;
   setEditingTodoId: (id: number | null) => void;
   inputRef: React.RefObject<HTMLInputElement>;
+  setError: (message: string) => void;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const TodoList: React.FC<Props> = ({
@@ -28,6 +30,8 @@ export const TodoList: React.FC<Props> = ({
   setEditingTodoId,
   editingTodoId,
   inputRef,
+  setError,
+  setLoading,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -44,6 +48,8 @@ export const TodoList: React.FC<Props> = ({
           editingTodoId={editingTodoId}
           setEditingTodoId={setEditingTodoId}
           inputRef={inputRef}
+          setError={setError}
+          setLoading={setLoading}
         />
       ))}
 
@@ -57,6 +63,8 @@ export const TodoList: React.FC<Props> = ({
           setEditingTodoId={() => {}}
           inputRef={inputRef}
           onRename={onRename}
+          setError={setError}
+          setLoading={setLoading}
         />
       )}
     </section>

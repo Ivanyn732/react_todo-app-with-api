@@ -3,9 +3,10 @@ import classNames from 'classnames';
 
 type Props = {
   error: string;
+  onClose: () => void;
 };
 
-export const Error: React.FC<Props> = ({ error }) => {
+export const Error: React.FC<Props> = ({ error, onClose }) => {
   return (
     <div
       data-cy="ErrorNotification"
@@ -17,11 +18,14 @@ export const Error: React.FC<Props> = ({ error }) => {
         { hidden: !error },
       )}
     >
-      <button data-cy="HideErrorButton" type="button" className="delete" />
-      {/* show only one message at a time */}
+      <button
+        data-cy="HideErrorButton"
+        type="button"
+        className="delete"
+        onClick={onClose}
+      />
       <br />
       {error}
-      {/* Unable to update a todo */}
     </div>
   );
 };
