@@ -222,12 +222,6 @@ export const App: React.FC = () => {
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
 
-      {/* {loading && (
-        <div data-cy="Loader" className="todoapp__loader">
-          <div className="loader" />
-        </div>
-      )} */}
-
       <div className="todoapp__content">
         <Header
           title={title}
@@ -257,7 +251,6 @@ export const App: React.FC = () => {
           setLoading={setLoading}
         />
 
-        {/* Hide the footer if there are no todos */}
         {todos.length > 0 && (
           <Footer
             todos={todos}
@@ -269,8 +262,6 @@ export const App: React.FC = () => {
         )}
       </div>
 
-      {/* DON'T use conditional rendering to hide the notification */}
-      {/* Add the 'hidden' class to hide the message smoothly */}
       <Error error={error} onClose={() => setError('')} />
     </div>
   );

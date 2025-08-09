@@ -36,9 +36,7 @@ export const TodoItem: React.FC<Props> = ({
   const [editedTitle, setEditedTitle] = useState(title);
 
   useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-    }
+    inputRef.current?.focus();
   }, [inputRef, isEditing]);
 
   useEffect(() => {
@@ -77,9 +75,7 @@ export const TodoItem: React.FC<Props> = ({
       setEditingTodoId(null);
     } catch {
       setError('Unable to delete a todo');
-    } finally {
-      setLoading(false);
-    }
+    } // видалив finally
   };
 
   const handleKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
