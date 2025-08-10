@@ -35,9 +35,7 @@ export const TodoItem: React.FC<Props> = ({
   const editInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    // коли входимо в режим редагування — фокус на локальний інпут
     if (isEditing) {
-      // невелике таймаут, щоб елемент встиг промальоватись у DOM
       setTimeout(() => editInputRef.current?.focus(), 0);
     }
   }, [isEditing]);
@@ -70,8 +68,6 @@ export const TodoItem: React.FC<Props> = ({
     }
 
     if (trimmedTitle === title) {
-      setEditingTodoId(null);
-
       return true;
     }
 
@@ -120,12 +116,12 @@ export const TodoItem: React.FC<Props> = ({
         <form
           onSubmit={async e => {
             e.preventDefault();
-            const ok = await handleEditSubmit();
+            const ok = handleEditSubmit();
 
-            if (ok) {
+            if (await ok) {
               setEditingTodoId(null);
             } else {
-              setTimeout(() => editInputRef.current?.focus(), 0);
+              editInputRef.current?.focus();
             }
           }}
         >
@@ -138,16 +134,16 @@ export const TodoItem: React.FC<Props> = ({
             onChange={handleTitleChange}
             onKeyUp={handleKeyUp}
             onBlur={async () => {
-              await new Promise(resolve => setTimeout(resolve, 0));
+              if (editedTitle.trim() === title) {
+                setEditingTodoId(null);
+
+                return;
+              }
 
               if (isEditing) {
-                const ok = await handleEditSubmit();
-
-                if (ok) {
-                  setTimeout(() => setEditingTodoId(null), 0);
-                } else {
-                  setTimeout(() => editInputRef.current?.focus(), 0);
-                }
+                setEditingTodoId(null);
+              } else {
+                editInputRef.current?.focus();
               }
             }}
           />
