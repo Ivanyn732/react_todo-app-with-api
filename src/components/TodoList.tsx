@@ -9,10 +9,8 @@ type Props = {
   onRename: (todoId: number, newTitle: string) => void;
   deletingTodoIds: number[];
   onToggleStatus: (todoId: number, newStatus: boolean) => void;
-  loadingTodoIds: number[];
   loadingAllTodos: boolean;
   setError: (message: string) => void;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const TodoList: React.FC<Props> = ({
@@ -22,10 +20,8 @@ export const TodoList: React.FC<Props> = ({
   onRename,
   deletingTodoIds,
   onToggleStatus,
-  loadingTodoIds,
   loadingAllTodos,
   setError,
-  setLoading,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -37,10 +33,8 @@ export const TodoList: React.FC<Props> = ({
           onRename={onRename}
           isDeleting={deletingTodoIds.includes(todo.id)}
           onToggleStatus={onToggleStatus}
-          isLoading={loadingTodoIds.includes(todo.id)}
           loading={loadingAllTodos}
           setError={setError}
-          setLoading={setLoading}
         />
       ))}
 
@@ -52,7 +46,6 @@ export const TodoList: React.FC<Props> = ({
           onToggleStatus={() => {}}
           onRename={onRename}
           setError={setError}
-          setLoading={setLoading}
         />
       )}
     </section>

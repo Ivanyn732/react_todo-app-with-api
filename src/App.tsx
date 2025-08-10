@@ -18,7 +18,7 @@ import { Filter } from './types/Filter';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingTodoIds, setLoadingTodoIds] = useState<number[]>([]);
   const [error, setError] = useState('');
   const [statusFilter, setStatusFilter] = useState<Filter>(Filter.All);
   const [title, setTitle] = useState('');
@@ -26,12 +26,14 @@ export const App: React.FC = () => {
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [deletingTodoIds, setDeletingTodoIds] = useState<number[]>([]);
 
+  const isLoading = loadingTodoIds.length > 0;
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const completedCount = todos.filter(todo => todo.completed).length;
 
   const loadTodos = async () => {
-    setLoading(true);
+    setLoadingTodoIds(ids => [...ids, 0]);
     setError('');
 
     try {
@@ -45,7 +47,7 @@ export const App: React.FC = () => {
         setError('');
       }, 3000);
     } finally {
-      setLoading(false);
+      setLoadingTodoIds(ids => ids.filter(id => id !== 0));
     }
   };
 
@@ -132,7 +134,7 @@ export const App: React.FC = () => {
   };
 
   const onToggleStatus = (todoId: number, newStatus: boolean) => {
-    setLoading(true);
+    setLoadingTodoIds(ids => [...ids, 0]);
 
     updateTodo(todoId, { completed: newStatus })
       .then(updatedTodo => {
@@ -148,12 +150,13 @@ export const App: React.FC = () => {
         setError('Unable to update a todo');
       })
       .finally(() => {
-        setLoading(false);
+        setLoadingTodoIds(ids => ids.filter(id => id !== 0));
       });
   };
 
   const toggleAll = async () => {
-    setLoading(true);
+    setLoadingTodoIds(ids => [...ids, 0]);
+
     const areAllCompleted = todos.every(todo => todo.completed);
     const newStatus = !areAllCompleted;
 
@@ -177,7 +180,7 @@ export const App: React.FC = () => {
       setError('Unable to update some todos');
       setTimeout(() => setError(''), 3000);
     } finally {
-      setLoading(false);
+      setLoadingTodoIds(ids => ids.filter(id => id !== 0));
     }
   };
 
@@ -199,7 +202,7 @@ export const App: React.FC = () => {
 
   const handleRename = async (todoId: number, newTitle: string) => {
     try {
-      setLoading(true);
+      setLoadingTodoIds(ids => [...ids, 0]);
 
       const updatedTodo = await updateTodo(todoId, { title: newTitle });
 
@@ -213,7 +216,7 @@ export const App: React.FC = () => {
       setTimeout(() => setError(''), 3000);
       throw err;
     } finally {
-      setLoading(false);
+      setLoadingTodoIds(ids => ids.filter(id => id !== 0));
     }
   };
 
@@ -231,7 +234,7 @@ export const App: React.FC = () => {
           toggleAll={toggleAll}
           isAllCompleted={todos.every(todo => todo.completed)}
           todos={todos}
-          isLoadingTodos={loading}
+          isLoadingTodos={isLoading}
         />
 
         <TodoList
@@ -242,9 +245,7 @@ export const App: React.FC = () => {
           onRename={handleRename}
           deletingTodoIds={deletingTodoIds}
           onToggleStatus={onToggleStatus}
-          loadingTodoIds={[]}
-          loadingAllTodos={loading}
-          setLoading={setLoading}
+          loadingAllTodos={isLoading}
         />
 
         {todos.length > 0 && (

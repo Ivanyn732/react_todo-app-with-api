@@ -7,11 +7,9 @@ type Props = {
   onDelete: (todoId: number) => void;
   isDeleting?: boolean;
   onToggleStatus: (todoId: number, newStatus: boolean) => void;
-  isLoading?: boolean;
   loading?: boolean;
   onRename: (todoId: number, newTitle: string) => void;
   setError: (message: string) => void;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const TodoItem: React.FC<Props> = ({
@@ -20,14 +18,13 @@ export const TodoItem: React.FC<Props> = ({
   onDelete,
   isDeleting,
   onToggleStatus,
-  isLoading,
   loading,
   onRename,
   setError,
-  setLoading,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
+  const [isSaving, setIsSaving] = useState(false);
   const editInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -49,7 +46,7 @@ export const TodoItem: React.FC<Props> = ({
 
     if (!trimmedTitle) {
       try {
-        setLoading(true);
+        setIsSaving(true);
         await onDelete(id);
         setIsEditing(false);
       } catch {
@@ -57,7 +54,7 @@ export const TodoItem: React.FC<Props> = ({
         setTimeout(() => setError(''), 3000);
         editInputRef.current?.focus();
       } finally {
-        setLoading(false);
+        setIsSaving(false);
       }
 
       return;
@@ -70,23 +67,19 @@ export const TodoItem: React.FC<Props> = ({
     }
 
     try {
-      setLoading(true);
+      setIsSaving(true);
       await onRename(id, trimmedTitle);
       setIsEditing(false);
     } catch {
       setError('Unable to update a todo');
       editInputRef.current?.focus();
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
   const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await saveTitle();
-  };
-
-  const finishEditing = async () => {
     await saveTitle();
   };
 
@@ -127,17 +120,7 @@ export const TodoItem: React.FC<Props> = ({
             value={editedTitle}
             onChange={handleTitleChange}
             onKeyUp={handleKeyUp}
-            onBlur={() => {
-              setTimeout(() => {
-                if (editedTitle.trim() === title) {
-                  setIsEditing(false);
-
-                  return;
-                }
-
-                finishEditing();
-              }, 0);
-            }}
+            onBlur={saveTitle}
           />
         </form>
       ) : (
@@ -163,7 +146,7 @@ export const TodoItem: React.FC<Props> = ({
 
       <div
         data-cy="TodoLoader"
-        className={`modal overlay ${isTemp || isDeleting || isLoading || loading ? 'is-active' : ''}`}
+        className={`modal overlay ${isTemp || isDeleting || isSaving || loading ? 'is-active' : ''}`}
       >
         <div className="modal-background has-background-white-ter" />
         <div className="loader" />
