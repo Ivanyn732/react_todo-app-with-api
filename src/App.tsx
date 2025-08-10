@@ -16,18 +16,15 @@ import { Error } from './components/Error';
 import { Todo } from './types/Todo';
 import { Filter } from './types/Filter';
 
-type StatusFilter = Filter;
-
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>(Filter.All);
+  const [statusFilter, setStatusFilter] = useState<Filter>(Filter.All);
   const [title, setTitle] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [deletingTodoIds, setDeletingTodoIds] = useState<number[]>([]);
-  const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -247,8 +244,6 @@ export const App: React.FC = () => {
           onToggleStatus={onToggleStatus}
           loadingTodoIds={[]}
           loadingAllTodos={loading}
-          editingTodoId={editingTodoId}
-          setEditingTodoId={setEditingTodoId}
           setLoading={setLoading}
         />
 

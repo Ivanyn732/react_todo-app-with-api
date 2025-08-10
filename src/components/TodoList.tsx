@@ -11,8 +11,6 @@ type Props = {
   onToggleStatus: (todoId: number, newStatus: boolean) => void;
   loadingTodoIds: number[];
   loadingAllTodos: boolean;
-  editingTodoId: number | null;
-  setEditingTodoId: (id: number | null) => void;
   setError: (message: string) => void;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -26,8 +24,6 @@ export const TodoList: React.FC<Props> = ({
   onToggleStatus,
   loadingTodoIds,
   loadingAllTodos,
-  setEditingTodoId,
-  editingTodoId,
   setError,
   setLoading,
 }) => {
@@ -43,8 +39,6 @@ export const TodoList: React.FC<Props> = ({
           onToggleStatus={onToggleStatus}
           isLoading={loadingTodoIds.includes(todo.id)}
           loading={loadingAllTodos}
-          editingTodoId={editingTodoId}
-          setEditingTodoId={setEditingTodoId}
           setError={setError}
           setLoading={setLoading}
         />
@@ -56,8 +50,6 @@ export const TodoList: React.FC<Props> = ({
           isTemp
           onDelete={() => {}}
           onToggleStatus={() => {}}
-          editingTodoId={null}
-          setEditingTodoId={() => {}}
           onRename={onRename}
           setError={setError}
           setLoading={setLoading}
