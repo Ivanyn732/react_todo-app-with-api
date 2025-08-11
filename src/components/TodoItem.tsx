@@ -4,11 +4,13 @@ import { Todo } from '../types/Todo';
 type Props = {
   todo: Todo;
   isTemp?: boolean;
-  onDelete: (todoId: number) => void;
   isDeleting?: boolean;
   onToggleStatus: (todoId: number, newStatus: boolean) => void;
   loading?: boolean;
-  onRename: (todoId: number, newTitle: string) => void;
+  onDelete: (todoId: number) => Promise<void> | void;
+  onRename: (todoId: number, newTitle: string) => Promise<void> | void;
+  // onDelete: (todoId: number) => void;
+  // onRename: (todoId: number, newTitle: string) => void;
   setError: (message: string) => void;
 };
 
@@ -44,6 +46,12 @@ export const TodoItem: React.FC<Props> = ({
   const saveTitle = async () => {
     const trimmedTitle = editedTitle.trim();
 
+    if (trimmedTitle === title) {
+      setIsEditing(false);
+
+      return;
+    }
+
     if (!trimmedTitle) {
       try {
         setIsSaving(true);
@@ -56,12 +64,6 @@ export const TodoItem: React.FC<Props> = ({
       } finally {
         setIsSaving(false);
       }
-
-      return;
-    }
-
-    if (trimmedTitle === title) {
-      setIsEditing(false);
 
       return;
     }
