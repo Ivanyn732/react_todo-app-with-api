@@ -9,8 +9,6 @@ type Props = {
   loading?: boolean;
   onDelete: (todoId: number) => Promise<void> | void;
   onRename: (todoId: number, newTitle: string) => Promise<void> | void;
-  // onDelete: (todoId: number) => void;
-  // onRename: (todoId: number, newTitle: string) => void;
   setError: (message: string) => void;
 };
 
@@ -123,6 +121,7 @@ export const TodoItem: React.FC<Props> = ({
             onChange={handleTitleChange}
             onKeyUp={handleKeyUp}
             onBlur={saveTitle}
+            autoFocus
           />
         </form>
       ) : (
